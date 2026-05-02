@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Dino Park</title>
+    <link rel="stylesheet" href="view/style.css" />
+</head>
+<body>
+    <div id="game-viewport"></div>
+
+    <div id="hud">
+        <div>Arrow keys / WASD: pan camera</div>
+        <div id="hud-camera">camera: 0, 0</div>
+    </div>
+
+    <!-- Config (must come before model so DinoListConfig is available to DinoLoader) -->
+    <script src="config/DinoListConfig.js"></script>
+
+    <!-- Model -->
+    <script src="model/Constants.js"></script>
+    <script src="model/BaseElement.js"></script>
+    <script src="model/Tile.js"></script>
+    <script src="model/TilesArray.js"></script>
+    <script src="model/Action.js"></script>
+    <script src="model/MoveToTileAction.js"></script>
+    <script src="model/Entity.js"></script>
+    <script src="model/DinoRegistry.js"></script>
+    <script src="model/DinoLoader.js"></script>
+    <script src="model/Dinosaur.js"></script>
+    <script src="model/World.js"></script>
+
+    <!-- ViewModel -->
+    <script src="viewmodel/BaseElementView.js"></script>
+    <script src="viewmodel/TileView.js"></script>
+    <script src="viewmodel/EntityView.js"></script>
+    <script src="viewmodel/WorldView.js"></script>
+
+    <!-- Entry point -->
+    <script src="main.js"></script>
+</body>
+</html>
