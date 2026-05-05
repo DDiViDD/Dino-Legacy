@@ -7,12 +7,17 @@ function Tile(gridX, gridY, grassLevel) {
     this.gridY = gridY;
     this.grassLevel = grassLevel;
     this.occupant = null;
+    this.world = null; // set by TilesArray when the world is built
 }
 
 Tile.prototype = Object.create(BaseElement.prototype);
 Tile.prototype.constructor = Tile;
 
 Tile.prototype.getAssetPath = function() {
+    var def = TerrainRegistry.get('Grass');
+    if (def && def.assetPathByLevel && def.assetPathByLevel[this.grassLevel] !== undefined) {
+        return def.assetPathByLevel[this.grassLevel];
+    }
     return 'assets/Terrain/GrassLevel' + this.grassLevel + '.png';
 };
 
@@ -20,5 +25,6 @@ Tile.prototype.setGrassLevel = function(level) {
     if (this.grassLevel !== level) {
         this.grassLevel = level;
         this.dirty = true;
+        if (this.world) this.world._emit('tileChanged', this);
     }
 };

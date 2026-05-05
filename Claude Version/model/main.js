@@ -6,14 +6,15 @@ DinoLoader.loadAll().then(() => {
 
     // --- Build a world --------------------------------------------------
     const grassPicker = (gx, gy) => {
-        const n = (gx * 7 + gy * 13) % 5;
+        return GrassLevel.Level0;
+        /*const n = (gx * 7 + gy * 13) % 5;
         if (n === 0) return GrassLevel.Level0;
         if (n === 1) return GrassLevel.Level1;
         if (n === 2) return GrassLevel.Level2;
-        return GrassLevel.Level3;
+        return GrassLevel.Level3;*/
     };
 
-    const world = new World(40, 10, grassPicker);
+    const world = new World(30, 20, grassPicker);
 
     // --- Mount the view -------------------------------------------------
     const viewport = document.getElementById('game-viewport');

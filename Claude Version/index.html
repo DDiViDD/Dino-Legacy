@@ -6,27 +6,40 @@
     <link rel="stylesheet" href="view/style.css" />
 </head>
 <body>
-    <div id="game-viewport"></div>
-
-    <div id="hud">
-        <div>Arrow keys / WASD: pan camera</div>
-        <div id="hud-camera">camera: 0, 0</div>
+    <div id="app">
+        <div id="game-viewport"></div>
     </div>
 
-    <!-- Config (must come before model so DinoListConfig is available to DinoLoader) -->
-    <script src="config/DinoListConfig.js"></script>
+    <!-- Configs -->
+    <script src="config/EntityConfigList.js"></script>
+    <script src="config/TerrainListConfig.js"></script>
+    <script src="config/BuyMenuConfig.js"></script>
 
     <!-- Model -->
     <script src="model/Constants.js"></script>
+    <script src="model/Scheduler.js"></script>
     <script src="model/BaseElement.js"></script>
     <script src="model/Tile.js"></script>
     <script src="model/TilesArray.js"></script>
     <script src="model/Action.js"></script>
     <script src="model/MoveToTileAction.js"></script>
+    <script src="model/EatGrassAction.js"></script>
     <script src="model/Entity.js"></script>
-    <script src="model/DinoRegistry.js"></script>
-    <script src="model/DinoLoader.js"></script>
+    <script src="model/EntityRegistry.js"></script>
+    <script src="model/EntityLoader.js"></script>
+    <script src="model/TerrainRegistry.js"></script>
+    <script src="model/TerrainLoader.js"></script>
+    <script src="model/GrassBehavior.js"></script>
+    <script src="model/BuyItemRegistry.js"></script>
+    <script src="model/BuyItemLoader.js"></script>
+    <script src="model/BuyItemActions.js"></script>
     <script src="model/Dinosaur.js"></script>
+    <script src="model/Drop.js"></script>
+    <script src="model/EntityFactory.js"></script>
+    <script src="model/DinoDropBehavior.js"></script>
+    <script src="model/Player.js"></script>
+    <script src="model/GameState.js"></script>
+    <script src="model/HighscoreStore.js"></script>
     <script src="model/World.js"></script>
 
     <!-- ViewModel -->
@@ -34,8 +47,16 @@
     <script src="viewmodel/TileView.js"></script>
     <script src="viewmodel/EntityView.js"></script>
     <script src="viewmodel/WorldView.js"></script>
+    <script src="viewmodel/SpriteColorCache.js"></script>
+    <script src="viewmodel/MoneyView.js"></script>
+    <script src="viewmodel/MinimapView.js"></script>
+    <script src="viewmodel/BuyMenuView.js"></script>
+    <script src="viewmodel/DropPickupView.js"></script>
+    <script src="viewmodel/GameHudView.js"></script>
+    <script src="viewmodel/SidebarView.js"></script>
+    <script src="viewmodel/VictoryView.js"></script>
 
-    <!-- Entry point -->
+    <!-- Entry -->
     <script src="main.js"></script>
 </body>
 </html>

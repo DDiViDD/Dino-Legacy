@@ -1,24 +1,118 @@
-// World: top-level game state. Owns the map, camera, tick loop, and entities.
+// World: top-level game state.
+//
+// Tile occupancy index + reservations:
+//   _entitiesByTile: tileKey -> [entities]   (where they ARE)
+//   _reservations:   tileKey -> entity        (who has CLAIMED it for an
+//                                              imminent move)
+//
+// hasBlockerAt() looks at presence; isTileAvailableFor(... self) considers
+// presence + reservations and excludes the self entity from both.
 
 function World(mapWidth, mapHeight, grassPicker) {
     this.tilesArray = new TilesArray(mapWidth, mapHeight, grassPicker || null);
+    this.tilesArray.attachWorld(this);
     this.camera     = { x: 0, y: 0 };
     this.entities   = [];
-    this._tickables = [];   // plain array instead of Set
-    this._tickHandle  = null;
-    this._lastTickTs  = 0;
-    this._tickCount   = 0;
-    this._listeners   = {
-        cameraMoved:   [],
-        tick:          [],
-        entityAdded:   [],
-        entityRemoved: []
+    this._tickables = [];
+    this.scheduler  = new Scheduler();
+
+    this._entitiesByTile = {};
+    this._reservations   = {}; // tileKey -> entity (or undefined)
+
+    this._tickHandle = null;
+    this._lastTickTs = 0;
+    this._tickCount  = 0;
+    this._listeners = {
+        cameraMoved:    [],
+        tick:           [],
+        entityAdded:    [],
+        entityRemoved:  [],
+        entityMoved:    [],
+        tileChanged:    []
     };
 }
 
 World.prototype.getPixelWidth  = function() { return this.tilesArray.width  * TILE_SIZE; };
 World.prototype.getPixelHeight = function() { return this.tilesArray.height * TILE_SIZE; };
 
+// ---- Tile occupancy + reservations -----------------------------------
+World.prototype._tileKeyXY = function(gx, gy) {
+    return gy * this.tilesArray.width + gx;
+};
+
+World.prototype.entitiesAt = function(gx, gy) {
+    return this._entitiesByTile[this._tileKeyXY(gx, gy)] || [];
+};
+
+World.prototype.hasBlockerAt = function(gx, gy) {
+    var list = this._entitiesByTile[this._tileKeyXY(gx, gy)];
+    if (!list) return false;
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].blocksTile) return true;
+    }
+    return false;
+};
+
+// True if `self` may walk onto / stand on (gx, gy) right now.
+// - The tile must exist.
+// - No blocker other than `self` may be standing on it.
+// - No reservation other than `self`'s own may be held on it.
+World.prototype.isTileAvailableFor = function(gx, gy, self) {
+    if (!this.tilesArray.getTile(gx, gy)) return false;
+    var key = this._tileKeyXY(gx, gy);
+
+    var list = this._entitiesByTile[key];
+    if (list) {
+        for (var i = 0; i < list.length; i++) {
+            var e = list[i];
+            if (e === self) continue;
+            if (e.blocksTile) return false;
+        }
+    }
+
+    var resv = this._reservations[key];
+    if (resv && resv !== self) return false;
+    return true;
+};
+
+// Try to claim (gx, gy) for `entity`. Succeeds only if the tile is
+// currently available for `entity`. Returns true on success.
+World.prototype.tryReserveTile = function(gx, gy, entity) {
+    if (!this.isTileAvailableFor(gx, gy, entity)) return false;
+    var key = this._tileKeyXY(gx, gy);
+    this._reservations[key] = entity;
+    return true;
+};
+
+// Release a reservation. No-op unless `entity` is the current holder.
+World.prototype.releaseReservation = function(gx, gy, entity) {
+    var key = this._tileKeyXY(gx, gy);
+    if (this._reservations[key] === entity) delete this._reservations[key];
+};
+
+// Free every reservation owned by `entity` (used on death/removal).
+World.prototype._releaseAllReservationsFor = function(entity) {
+    for (var key in this._reservations) {
+        if (this._reservations[key] === entity) delete this._reservations[key];
+    }
+};
+
+World.prototype._reindexEntity = function(entity, fromKey, toKey) {
+    if (fromKey !== null && fromKey !== undefined) {
+        var arr = this._entitiesByTile[fromKey];
+        if (arr) {
+            var idx = arr.indexOf(entity);
+            if (idx !== -1) arr.splice(idx, 1);
+            if (arr.length === 0) delete this._entitiesByTile[fromKey];
+        }
+    }
+    if (toKey !== null && toKey !== undefined) {
+        if (!this._entitiesByTile[toKey]) this._entitiesByTile[toKey] = [];
+        this._entitiesByTile[toKey].push(entity);
+    }
+};
+
+// ---- Tick system -----------------------------------------------------
 World.prototype.registerTickable = function(el) {
     if (this._tickables.indexOf(el) === -1) this._tickables.push(el);
 };
@@ -35,26 +129,35 @@ World.prototype.start = function() {
 };
 
 World.prototype.stop = function() {
-    if (this._tickHandle !== null) {
-        clearInterval(this._tickHandle);
-        this._tickHandle = null;
-    }
+    if (this._tickHandle !== null) { clearInterval(this._tickHandle); this._tickHandle = null; }
 };
 
 World.prototype._tick = function() {
-    var now     = performance.now();
+    var now = performance.now();
     var deltaMs = now - this._lastTickTs;
     this._lastTickTs = now;
     this._tickCount++;
-    for (var i = 0; i < this._tickables.length; i++) {
-        this._tickables[i].onTick(deltaMs);
-    }
+
+    this.scheduler.runDue(now);
+
+    var snapshot = this._tickables.slice();
+    for (var i = 0; i < snapshot.length; i++) snapshot[i].onTick(deltaMs);
+
     this._emit('tick', { deltaMs: deltaMs, tickCount: this._tickCount });
 };
 
+// ---- Entities --------------------------------------------------------
 World.prototype.addEntity = function(entity) {
     this.entities.push(entity);
+    entity.world = this;
     this.registerTickable(entity);
+
+    var gx = Math.round(entity.x / TILE_SIZE);
+    var gy = Math.round(entity.y / TILE_SIZE);
+    var key = this._tileKeyXY(gx, gy);
+    entity._tileKey = key;
+    this._reindexEntity(entity, null, key);
+
     this._emit('entityAdded', entity);
     return entity;
 };
@@ -62,20 +165,42 @@ World.prototype.addEntity = function(entity) {
 World.prototype.removeEntity = function(entity) {
     var idx = this.entities.indexOf(entity);
     if (idx === -1) return;
+
+    // End any in-flight action so its onEnd can release reservations cleanly.
+    if (entity.currentAction && !entity.currentAction.isDone) {
+        entity.currentAction.isDone = true;
+        try { entity.currentAction.onEnd(entity); } catch (e) {}
+        entity.currentAction = null;
+    }
+    // Belt-and-braces: drop any reservations still attributed to this entity.
+    this._releaseAllReservationsFor(entity);
+
     this.entities.splice(idx, 1);
     this.unregisterTickable(entity);
+    this._reindexEntity(entity, entity._tileKey, null);
+    entity._tileKey = null;
+    entity.world = null;
     this._emit('entityRemoved', entity);
 };
 
-World.prototype.moveCamera = function(dx, dy) {
-    this.camera.x += dx;
-    this.camera.y += dy;
-    this._emit('cameraMoved', this.camera);
+World.prototype._onEntityMoved = function(entity) {
+    var gx = Math.round(entity.x / TILE_SIZE);
+    var gy = Math.round(entity.y / TILE_SIZE);
+    var newKey = this._tileKeyXY(gx, gy);
+    if (newKey !== entity._tileKey) {
+        this._reindexEntity(entity, entity._tileKey, newKey);
+        entity._tileKey = newKey;
+    }
+    this._emit('entityMoved', entity);
 };
 
+// ---- Camera + events -------------------------------------------------
+World.prototype.moveCamera = function(dx, dy) {
+    this.camera.x += dx; this.camera.y += dy;
+    this._emit('cameraMoved', this.camera);
+};
 World.prototype.setCamera = function(x, y) {
-    this.camera.x = x;
-    this.camera.y = y;
+    this.camera.x = x; this.camera.y = y;
     this._emit('cameraMoved', this.camera);
 };
 

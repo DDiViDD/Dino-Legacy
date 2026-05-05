@@ -1,4 +1,4 @@
-// TilesArray: 2D grid of Tile objects stored as a flat row-major array.
+// TilesArray: 2D grid of Tile objects.
 
 function TilesArray(width, height, grassPicker) {
     this.width = width;
@@ -22,4 +22,9 @@ TilesArray.prototype.forEach = function(callback) {
     for (var i = 0; i < this.tiles.length; i++) {
         if (callback(this.tiles[i]) === false) return;
     }
+};
+
+// Called by World once it's the owner. Lets tiles emit world-level events.
+TilesArray.prototype.attachWorld = function(world) {
+    for (var i = 0; i < this.tiles.length; i++) this.tiles[i].world = world;
 };
