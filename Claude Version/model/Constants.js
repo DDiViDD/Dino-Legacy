@@ -24,8 +24,13 @@ var DEFAULT_SEEK_FOOD_SATIATION      = 50;
 var DEFAULT_DESPERATE_SATIATION      = 20;
 
 // --- Game session -------------------------------------------------------
-var GAME_DURATION_SEC = 300;   // 10 minutes
+var GAME_DURATION_SEC = 300;   // 5 minutes
 var SCORE_INTERVAL_MS = 1000;  // accumulate score every 1s
+
+// --- Camera ------------------------------------------------------------
+var CAMERA_PAN_SPEED   = 6;    // base pixels per pan tick (orth/diag both
+                               // scaled by sqrt(2) for equal magnitudes)
+var CAMERA_TICK_MS     = 16;   // ~60Hz pan tick rate
 
 // Helper: treat null, undefined, NaN, and negative numbers as "never".
 function isNeverValue(v) {

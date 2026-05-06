@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Dino Park — Tests</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+               background: #1a1a1f; color: #ddd; margin: 24px; }
+        h1   { color: #ffd34a; margin: 0 0 18px; }
+        .test-summary {
+            display: inline-block;
+            padding: 8px 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+        .test-summary.all-pass { background: #2a4a2a; color: #b8f0b8; }
+        .test-summary.has-fail { background: #4a2a2a; color: #ffb6b6; }
+
+        .test-list { list-style: none; padding: 0; margin: 0; }
+        .test-item {
+            padding: 8px 12px;
+            border-left: 3px solid #444;
+            margin-bottom: 4px;
+            background: #25252a;
+        }
+        .test-item.pass { border-left-color: #6ec46e; }
+        .test-item.fail { border-left-color: #d05858; background: #2a1f1f; }
+
+        .test-status { font-weight: bold; margin-right: 10px; font-size: 16px; }
+        .test-item.pass .test-status { color: #6ec46e; }
+        .test-item.fail .test-status { color: #ff7878; }
+
+        .test-name  { color: #ddd; }
+        .test-error {
+            color: #ff9090;
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            font-size: 13px;
+            margin-top: 6px;
+            margin-left: 30px;
+            white-space: pre-wrap;
+        }
+
+        .test-instructions { color: #888; font-size: 13px; margin-bottom: 18px; }
+        .test-instructions code {
+            background: #25252a; padding: 1px 6px; border-radius: 3px;
+            color: #ffd34a;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dino Park — Tests</h1>
+    <p class="test-instructions">
+        Tests for pure model logic. Open this file directly (file://) or
+        through a server. Add a new test by creating
+        <code>tests/yourname.test.js</code> and listing it below.
+    </p>
+    <div id="results"></div>
+
+    <!-- Model dependencies needed by the tests below.
+         Keep this list minimal — only what the tested modules import. -->
+    <script src="../model/Constants.js"></script>
+    <script src="../model/Scheduler.js"></script>
+
+    <!-- GameState's tests use the static scoreIncrement function only,
+         but the file also defines a constructor that references World
+         and EntityRegistry at construction-time. The static method has
+         no such dependency, so loading the file alone is fine. -->
+    <script src="../model/GameState.js"></script>
+
+    <!-- Test framework -->
+    <script src="runner.js"></script>
+
+    <!-- Test files (add new ones here) -->
+    <script src="scheduler.test.js"></script>
+    <script src="gamestate.test.js"></script>
+
+    <!-- Run -->
+    <script>
+        runTests(document.getElementById('results'));
+    </script>
+</body>
+</html>

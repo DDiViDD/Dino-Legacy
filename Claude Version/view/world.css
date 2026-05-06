@@ -1,7 +1,12 @@
 /* The game viewport (left side) and the in-world edge shadow overlay. */
 
 #game-viewport {
+    /* Establish a stacking context (z-index + isolation) so the edge
+       shadow's z-index can never escape this element to compete with
+       body-level overlays like the victory modal. */
     position: relative;
+    z-index: 0;
+    isolation: isolate;
     flex: 1;
     overflow: hidden;
     background: #000;

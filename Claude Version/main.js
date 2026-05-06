@@ -3,9 +3,9 @@
 // modules; this file should remain small.
 
 function applyMinimapColorOverrides() {
-    var defs = EntityRegistry._defs;
-    for (var name in defs) {
-        var def = defs[name];
+    var ents = EntityRegistry.entries();
+    for (var i = 0; i < ents.length; i++) {
+        var def = ents[i].def;
         if (def.minimapColor && def.assetPath) {
             SpriteColorCache.setOverride(def.assetPath, def.minimapColor);
         }
@@ -14,9 +14,10 @@ function applyMinimapColorOverrides() {
 
 function spawnStarterDino(world) {
     var entries = EntityRegistry.entries();
-    for (var entry of entries) {
-        var def = entry.def;
-        var name = entry.name;
+    for (var i = 0; i < entries.length; i++) {
+        var entry = entries[i];
+        var def   = entry.def;
+        var name  = entry.name;
         if (def.kind === 'dino' && def.isLiving !== false) {
             var gx = Math.floor(world.tilesArray.width  / 2);
             var gy = Math.floor(world.tilesArray.height / 2);
@@ -30,6 +31,11 @@ function spawnStarterDino(world) {
 
 function defaultGrassPicker(gx, gy) {
     return GrassLevel.Level0;
+    /*var n = (gx * 7 + gy * 13) % 5;
+    if (n === 0) return GrassLevel.Level0;
+    if (n === 1) return GrassLevel.Level1;
+    if (n === 2) return GrassLevel.Level2;
+    return GrassLevel.Level3;*/
 }
 
 function startGame() {

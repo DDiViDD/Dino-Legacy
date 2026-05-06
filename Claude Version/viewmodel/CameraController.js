@@ -5,8 +5,10 @@
     function CameraController(world, options) {
         options = options || {};
         this.world      = world;
-        this.panSpeed   = options.panSpeed   || 6;
-        this.tickMs     = options.tickMs     || 16;
+        // Defaults come from Constants.js; options override on a per-
+        // instance basis (useful for tests or alternate input modes).
+        this.panSpeed   = options.panSpeed !== undefined ? options.panSpeed : CAMERA_PAN_SPEED;
+        this.tickMs     = options.tickMs   !== undefined ? options.tickMs   : CAMERA_TICK_MS;
         this._pressed   = {};
         this._timer     = null;
 
