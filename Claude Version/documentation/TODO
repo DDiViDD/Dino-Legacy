@@ -1,0 +1,12 @@
+1. A real InputController would unify the click routing currently scattered across WorldView, MinimapView, and BuyMenuView. Right now each component handles its own clicks; if you ever add hotkeys or want to route clicks differently when the buy menu is selected vs not, you'll wish for a single owner.
+2. Ability to save game, not just as a feature, but more to battle harden the architecture.
+
+My task:
+- Ungit/github desktop setup.
+
+John task:
+- Add dino/meat corpse
+
+David task:
+- Get AI to add a config field for isMeat and a dino flag for eatsMeat so some dinos can consume corpses.
+- Add his own dinos and spawn eggs.
