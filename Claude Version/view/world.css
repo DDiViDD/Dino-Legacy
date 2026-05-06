@@ -1,0 +1,21 @@
+/* The game viewport (left side) and the in-world edge shadow overlay. */
+
+#game-viewport {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    background: #000;
+    cursor: crosshair;
+}
+
+/* 15px black-to-transparent gradient inset around the MAP edges.
+   Sits in world space (sized + positioned inline by WorldView). */
+.edge-shadow {
+    pointer-events: none;
+    z-index: 9999;
+    background:
+        linear-gradient(to right,  rgba(0,0,0,1), rgba(0,0,0,0) 15px) left   / 15px 100% no-repeat,
+        linear-gradient(to left,   rgba(0,0,0,1), rgba(0,0,0,0) 15px) right  / 15px 100% no-repeat,
+        linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0) 15px) top    / 100% 15px no-repeat,
+        linear-gradient(to top,    rgba(0,0,0,1), rgba(0,0,0,0) 15px) bottom / 100% 15px no-repeat;
+}

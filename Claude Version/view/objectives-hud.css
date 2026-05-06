@@ -1,0 +1,33 @@
+/* Objectives HUD overlay (top-left of screen). */
+
+.objectives-hud {
+    position: fixed;
+    top: 24px;
+    left: 28px;
+    /* Above the edge-shadow (9999). */
+    z-index: 10000;
+    pointer-events: none;
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.4;
+    letter-spacing: 0.4px;
+    text-shadow:
+        0 2px 4px rgba(0,0,0,0.95),
+        0 0 6px rgba(0,0,0,0.85),
+        1px 1px 0 rgba(0,0,0,0.7);
+}
+.objectives-hud .obj-label {
+    color: #ffd34a;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-size: 13px;
+}
+.objectives-hud.urgent           { color: #ffb6b6; }
+.objectives-hud.urgent .obj-label{ color: #ff7878; animation: obj-pulse 1s infinite; }
+
+@keyframes obj-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.55; }
+}

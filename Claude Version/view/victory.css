@@ -1,0 +1,87 @@
+/* End-of-game modal with name input + highscore list. */
+
+.victory-modal {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.78);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 5000;
+    font-family: inherit;
+}
+.victory-modal.hidden { display: none; }
+
+.victory-box {
+    background: linear-gradient(180deg, #2d2d33, #1a1a1f);
+    border: 2px solid #ffd34a;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(255, 211, 74, 0.35);
+    padding: 28px 36px;
+    width: 420px;
+    color: #eee;
+    text-align: center;
+}
+.victory-box h1 {
+    margin: 0 0 8px;
+    color: #ffd34a;
+    font-size: 28px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+.victory-box h2 {
+    margin: 22px 0 8px;
+    color: #aaa;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+.victory-score {
+    font-size: 22px;
+    margin-bottom: 18px;
+    color: #ffd34a;
+    font-weight: bold;
+}
+
+.victory-name-row {
+    display: flex; gap: 8px;
+    margin-bottom: 10px;
+}
+.victory-name {
+    flex: 1;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid #555;
+    color: #eee;
+    padding: 8px 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    font: inherit;
+}
+.victory-name:focus { outline: none; border-color: #ffd34a; }
+.victory-submit, .victory-replay {
+    background: linear-gradient(180deg, #6a5a20, #3a3010);
+    color: #ffe9a8;
+    border: 1px solid #ffd34a;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    font: inherit;
+    font-weight: bold;
+}
+.victory-submit:hover, .victory-replay:hover { background: linear-gradient(180deg, #8a7530, #5a4515); }
+.victory-submit:disabled { opacity: 0.6; cursor: default; }
+.victory-replay { margin-top: 18px; padding: 10px 24px; }
+
+.victory-highscores {
+    list-style: none; padding: 0; margin: 0;
+    text-align: left;
+    max-height: 220px; overflow-y: auto;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+.victory-highscores li {
+    display: flex; justify-content: space-between;
+    padding: 6px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.victory-highscores li:last-child { border-bottom: none; }
+.victory-highscores .hs-name      { color: #ddd; }
+.victory-highscores .hs-score     { color: #ffd34a; font-weight: bold; }
+.victory-highscores .victory-empty{ justify-content: center; color: #888; font-style: italic; }
