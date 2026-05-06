@@ -1,3 +1,4 @@
+(function() {
 // VictoryView: full-screen modal shown when GameState ends.
 // Shows final score, lets the player save their name to the highscore
 // cookie, displays the current top scores, and offers Play Again.
@@ -104,3 +105,6 @@ VictoryView.prototype._renderHighscores = function() {
         this._highscoreList.appendChild(li);
     }
 };
+
+    window.VictoryView = VictoryView;
+})();

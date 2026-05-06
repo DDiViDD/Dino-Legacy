@@ -1,3 +1,4 @@
+(function() {
 // WorldView: top-level renderer. Manages stacked layers and child views.
 //
 // Layers (back -> front):
@@ -80,7 +81,7 @@ function WorldView(world, mountEl) {
                 var ents = self.world.entitiesAt(gx + dgx, gy + dgy);
                 for (var k = 0; k < ents.length; k++) {
                     var e = ents[k];
-                    if (!(e instanceof Drop)) continue;
+                    if (e.type !== ElementType.Drop) continue;
                     // Visual center: entity x/y is tile top-left of where
                     // EntityView centers it, so the visible center is at
                     // (x + TILE_SIZE/2, y + TILE_SIZE/2).
@@ -175,3 +176,6 @@ WorldView.prototype.destroy = function() {
     var keys = ['terrain', 'structures', 'entitiesLow', 'entitiesHigh', 'effects'];
     for (var j = 0; j < keys.length; j++) this.layers[keys[j]].parentNode.removeChild(this.layers[keys[j]]);
 };
+
+    window.WorldView = WorldView;
+})();

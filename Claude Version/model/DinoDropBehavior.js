@@ -57,12 +57,16 @@ var DinoDropBehavior = (function() {
     return {
         bootstrap: function(world) {
             world.on('entityAdded', function(entity) {
-                if (entity instanceof Dinosaur) _scheduleNextDrop(entity);
+                if (entity.species && EntityRegistry.isKind(entity.species, 'dino')) {
+                    _scheduleNextDrop(entity);
+                }
             });
             // Already-present dinos at boot:
             for (var i = 0; i < world.entities.length; i++) {
                 var e = world.entities[i];
-                if (e instanceof Dinosaur) _scheduleNextDrop(e);
+                if (e.species && EntityRegistry.isKind(e.species, 'dino')) {
+                    _scheduleNextDrop(e);
+                }
             }
         }
     };

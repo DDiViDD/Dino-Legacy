@@ -6,6 +6,7 @@ var ElementType = Object.freeze({
     Terrain:   'Terrain',
     Entity:    'Entity',
     Structure: 'Structure',
+    Drop:      'Drop',
     UI:        'UI',
     Effect:    'Effect'
 });

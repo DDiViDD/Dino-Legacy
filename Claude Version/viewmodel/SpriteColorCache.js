@@ -2,14 +2,10 @@
 //
 // Color sources, in priority order:
 //   1. Explicit override via setOverride(url, color)
-//   2. Average of solidly-opaque pixels (alpha-weighted), with a relaxed
-//      pass if no fully-opaque pixels exist
-//   3. Hardcoded fallback by URL substring (used when canvas is tainted,
-//      e.g. on file:// in some browsers)
-//
-// On fallback, a console.warn fires so it's obvious if sampling failed.
+//   2. Average of solidly-opaque pixels (alpha-weighted)
+//   3. Hardcoded fallback by URL substring (used when canvas is tainted)
 
-var SpriteColorCache = (function() {
+(function() {
     var ALPHA_BODY_MIN = 200;
 
     var cache    = {};
@@ -52,45 +48,46 @@ var SpriteColorCache = (function() {
         return 'rgb(' + (rW / totalA | 0) + ',' + (gW / totalA | 0) + ',' + (bW / totalA | 0) + ')';
     }
 
-    return {
-        setOverride: function(url, color) {
-            cache[url] = color;
-        },
+    function setOverride(url, color) { cache[url] = color; }
+    function peek(url) { return cache[url] || null; }
 
-        peek: function(url) { return cache[url] || null; },
+    function get(url, callback) {
+        if (cache[url]) { callback(cache[url]); return; }
+        if (pending[url]) { pending[url].push(callback); return; }
+        pending[url] = [callback];
 
-        get: function(url, callback) {
-            if (cache[url]) { callback(cache[url]); return; }
-            if (pending[url]) { pending[url].push(callback); return; }
-            pending[url] = [callback];
-
-            var img = new Image();
-            img.onload = function() {
-                var canvas = document.createElement('canvas');
-                canvas.width  = img.naturalWidth  || img.width;
-                canvas.height = img.naturalHeight || img.height;
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                try {
-                    var data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-                    var color = sampleAverage(data, ALPHA_BODY_MIN);
-                    if (!color) color = sampleAverage(data, 16);
-                    if (!color) {
-                        console.warn('SpriteColorCache: image had no usable pixels:', url);
-                        flush(url, fallbackFor(url));
-                        return;
-                    }
-                    flush(url, color);
-                } catch (e) {
-                    console.warn('SpriteColorCache: tainted canvas, using fallback for', url);
+        var img = new Image();
+        img.onload = function() {
+            var canvas = document.createElement('canvas');
+            canvas.width  = img.naturalWidth  || img.width;
+            canvas.height = img.naturalHeight || img.height;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            try {
+                var data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                var color = sampleAverage(data, ALPHA_BODY_MIN);
+                if (!color) color = sampleAverage(data, 16);
+                if (!color) {
+                    console.warn('SpriteColorCache: image had no usable pixels:', url);
                     flush(url, fallbackFor(url));
+                    return;
                 }
-            };
-            img.onerror = function() {
-                console.warn('SpriteColorCache: image failed to load, using fallback for', url);
+                flush(url, color);
+            } catch (e) {
+                console.warn('SpriteColorCache: tainted canvas, using fallback for', url);
                 flush(url, fallbackFor(url));
-            };
-            img.src = url;
-        }
+            }
+        };
+        img.onerror = function() {
+            console.warn('SpriteColorCache: image failed to load, using fallback for', url);
+            flush(url, fallbackFor(url));
+        };
+        img.src = url;
+    }
+
+    window.SpriteColorCache = {
+        setOverride: setOverride,
+        peek: peek,
+        get: get
     };
 })();

@@ -1,6 +1,6 @@
 /* Master stylesheet — imports per-component styles.
    Loaded as the only stylesheet from index.html so we keep one <link>
-   while the rules themselves live in component-sized files. */
+   while the rules themselves live in component-sized files in view/. */
 
 @import url('base.css');
 @import url('world.css');

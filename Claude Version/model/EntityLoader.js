@@ -1,17 +1,7 @@
-// EntityLoader: loads all entity config files declared in EntityConfigList.
-//
-// Format expected:
-//   var EntityConfigList = [
-//       { path: 'model/dinos/', configs: ['Brachiosaur', 'skeleton'] },
-//       { path: 'model/drops/', configs: ['Coin'] }
-//   ];
-//
-// path is appended to each config name + '.js'. So adding a new entity is
-// a one-line edit in EntityConfigList plus the new config file.
+// EntityLoader: loads all entity config files from EntityConfigList.
 
-var EntityLoader = {
-    loadAll: function(onComplete) {
-        // Flatten all (path, name) pairs.
+(function() {
+    function loadAll(onComplete) {
         var items = [];
         for (var i = 0; i < EntityConfigList.length; i++) {
             var group = EntityConfigList[i];
@@ -21,14 +11,13 @@ var EntityLoader = {
         }
         var remaining = items.length;
         if (remaining === 0) { onComplete(); return; }
-
         function onOne() { remaining--; if (remaining === 0) onComplete(); }
         for (var k = 0; k < items.length; k++) {
-            EntityLoader._loadScript(items[k].path, items[k].name, onOne);
+            _loadScript(items[k].path, items[k].name, onOne);
         }
-    },
+    }
 
-    _loadScript: function(path, name, onDone) {
+    function _loadScript(path, name, onDone) {
         var script = document.createElement('script');
         var src = path.charAt(path.length - 1) === '/' ? path + name + '.js' : path + '/' + name + '.js';
         script.src = src;
@@ -39,4 +28,6 @@ var EntityLoader = {
         };
         document.head.appendChild(script);
     }
-};
+
+    window.EntityLoader = { loadAll: loadAll };
+})();

@@ -4,13 +4,11 @@
 // Each registered entry must include a `kind` field that names which
 // concrete class to instantiate. EntityFactory uses it to spawn the
 // right object.
-//
-// Replaces the old separate DinoRegistry + DropRegistry.
 
-var EntityRegistry = {
-    _defs: {},
+(function() {
+    var _defs = {};
 
-    register: function(name, def) {
+    function register(name, def) {
         if (!def || !def.kind) {
             console.error('EntityRegistry: ' + name + ' missing required field "kind"');
             return;
@@ -19,31 +17,38 @@ var EntityRegistry = {
         for (var k in def) {
             if (def.hasOwnProperty(k)) entry[k] = def[k];
         }
-        this._defs[name] = entry;
+        _defs[name] = entry;
         console.log('EntityRegistry: registered ' + name + ' (' + def.kind + ')');
-    },
+    }
 
-    get:    function(name) { return this._defs[name] || null; },
-    has:    function(name) { return name in this._defs; },
-
-    // Returns the kind string, or null if not registered.
-    kindOf: function(name) {
-        var d = this._defs[name];
-        return d ? d.kind : null;
-    },
-
-    // Convenience: is this name a registered entity of the given kind?
-    isKind: function(name, kind) {
-        var d = this._defs[name];
+    function get(name)    { return _defs[name] || null; }
+    function has(name)    { return name in _defs; }
+    function kindOf(name) { var d = _defs[name]; return d ? d.kind : null; }
+    function isKind(name, kind) {
+        var d = _defs[name];
         return !!d && d.kind === kind;
-    },
-
-    // Returns all entries with the given kind.
-    allOfKind: function(kind) {
+    }
+    function allOfKind(kind) {
         var out = [];
-        for (var n in this._defs) {
-            if (this._defs[n].kind === kind) out.push(this._defs[n]);
-        }
+        for (var n in _defs) if (_defs[n].kind === kind) out.push(_defs[n]);
         return out;
     }
-};
+
+    // Returns [{ name, def }, ...] for callers that need to iterate
+    // every registered entity (e.g. preloading assets).
+    function entries() {
+        var out = [];
+        for (var n in _defs) out.push({ name: n, def: _defs[n] });
+        return out;
+    }
+
+    window.EntityRegistry = {
+        register:  register,
+        get:       get,
+        has:       has,
+        kindOf:    kindOf,
+        isKind:    isKind,
+        allOfKind: allOfKind,
+        entries:   entries
+    };
+})();

@@ -1,10 +1,6 @@
-// HighscoreStore: read/write top scores in a cookie. Sorted descending,
-// trimmed to MAX_ENTRIES. Pure data — no DOM.
-//
-// On file:// URLs cookies sometimes fail silently. If you ever need a
-// fallback, swap readCookie/writeCookie for localStorage equivalents.
+// HighscoreStore: cookie-backed read/write of top scores.
 
-var HighscoreStore = (function() {
+(function() {
     var COOKIE_NAME = 'dinopark_highscores';
     var MAX_ENTRIES = 10;
 
@@ -22,20 +18,19 @@ var HighscoreStore = (function() {
 
     function writeCookie(scores) {
         var enc = encodeURIComponent(JSON.stringify(scores));
-        // No path= because file:// origins ignore it.
         document.cookie = COOKIE_NAME + '=' + enc + '; max-age=31536000';
     }
 
-    return {
-        getAll: function() { return readCookie(); },
+    function getAll() { return readCookie(); }
 
-        add: function(name, score) {
-            var list = readCookie();
-            list.push({ name: String(name).slice(0, 20), score: Math.floor(score), ts: Date.now() });
-            list.sort(function(a, b) { return b.score - a.score; });
-            list = list.slice(0, MAX_ENTRIES);
-            writeCookie(list);
-            return list;
-        }
-    };
+    function add(name, score) {
+        var list = readCookie();
+        list.push({ name: String(name).slice(0, 20), score: Math.floor(score), ts: Date.now() });
+        list.sort(function(a, b) { return b.score - a.score; });
+        list = list.slice(0, MAX_ENTRIES);
+        writeCookie(list);
+        return list;
+    }
+
+    window.HighscoreStore = { getAll: getAll, add: add };
 })();

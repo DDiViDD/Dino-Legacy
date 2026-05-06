@@ -1,3 +1,4 @@
+(function() {
 // BuyMenuView: renders the scrollable, two-column item list and handles
 // item selection + placement.
 //
@@ -150,3 +151,6 @@ BuyMenuView.prototype._handleTileClick = function(payload) {
         this._statusBar.textContent = 'Cannot place ' + item.name + ' there.';
     }
 };
+
+    window.BuyMenuView = BuyMenuView;
+})();

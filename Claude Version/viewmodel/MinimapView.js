@@ -1,3 +1,4 @@
+(function() {
 // MinimapView: 2px-per-tile overview of the world.
 //
 // Layout:
@@ -238,3 +239,6 @@ MinimapView.prototype._requestSprite = function(url, onResolved) {
     this._spriteRequested[url] = true;
     SpriteColorCache.get(url, function() { onResolved(); });
 };
+
+    window.MinimapView = MinimapView;
+})();
